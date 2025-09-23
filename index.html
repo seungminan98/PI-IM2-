@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>제품 프로토타입 개발 관리 시스템 대시보드</title>
+    <title>Biz FORCE - 제품 프로토타입 개발 관리 시스템</title>
+    <link rel="icon" type="image/png" href="icon.png">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -29,6 +30,15 @@
         .header h1 {
             font-size: 1.8rem;
             font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+
+        .header-logo {
+            width: 40px;
+            height: 40px;
+            margin-right: 1rem;
+            border-radius: 8px;
         }
 
         .header p {
@@ -299,8 +309,11 @@
 </head>
 <body>
     <div class="header">
-        <h1><i class="fas fa-cogs"></i> 제품 프로토타입 개발 관리 시스템</h1>
-        <p>협업 툴 기반 통합 프로젝트 관리 대시보드</p>
+        <h1>
+            <img src="icon.png" alt="Biz FORCE Logo" class="header-logo">
+            Biz FORCE
+        </h1>
+        <p>제품 프로토타입 개발 관리 시스템 - 협업 툴 기반 통합 프로젝트 관리 대시보드</p>
     </div>
 
     <div class="container">
@@ -331,7 +344,7 @@
         <!-- 메인 대시보드 그리드 -->
         <div class="dashboard-grid">
             <!-- 프로젝트 현황 -->
-            <div class="card">
+            <!-- <div class="card">
                 <div class="card-header">
                     <i class="fas fa-project-diagram"></i>
                     <h3>프로젝트 현황</h3>
@@ -368,7 +381,7 @@
                     <span class="status-badge status-on-track">최종 단계</span>
                     <span style="float: right; color: #666;">90% 완료</span>
                 </div>
-            </div>
+            </div> -->
 
             <!-- 일정 관리 -->
             <div class="card">
@@ -530,7 +543,7 @@
             </div>
 
             <!-- 진행률 차트 -->
-            <div class="card">
+            <!-- <div class="card">
                 <div class="card-header">
                     <i class="fas fa-chart-line"></i>
                     <h3>프로젝트 진행률</h3>
@@ -538,7 +551,7 @@
                 <div class="chart-container">
                     <canvas id="progressChart"></canvas>
                 </div>
-            </div>
+            </div> -->
 
             <!-- 프로젝트 상태 분포 (도넛차트) -->
             <div class="card">
@@ -649,52 +662,52 @@
 
     <script>
         // 진행률 차트 생성
-        const ctx = document.getElementById('progressChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['1주차', '2주차', '3주차', '4주차', '5주차', '6주차'],
-                datasets: [{
-                    label: '스마트 워치 프로토타입',
-                    data: [10, 25, 40, 55, 70, 75],
-                    borderColor: '#667eea',
-                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
-                    tension: 0.4
-                }, {
-                    label: 'IoT 센서 모듈',
-                    data: [5, 15, 25, 35, 40, 45],
-                    borderColor: '#764ba2',
-                    backgroundColor: 'rgba(118, 75, 162, 0.1)',
-                    tension: 0.4
-                }, {
-                    label: '웨어러블 디바이스',
-                    data: [20, 40, 60, 75, 85, 90],
-                    borderColor: '#28a745',
-                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'top',
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        max: 100,
-                        ticks: {
-                            callback: function(value) {
-                                return value + '%';
-                            }
-                        }
-                    }
-                }
-            }
-        });
+        // const ctx = document.getElementById('progressChart').getContext('2d');
+        // new Chart(ctx, {
+        //     type: 'line',
+        //     data: {
+        //         labels: ['1주차', '2주차', '3주차', '4주차', '5주차', '6주차'],
+        //         datasets: [{
+        //             label: '스마트 워치 프로토타입',
+        //             data: [10, 25, 40, 55, 70, 75],
+        //             borderColor: '#667eea',
+        //             backgroundColor: 'rgba(102, 126, 234, 0.1)',
+        //             tension: 0.4
+        //         }, {
+        //             label: 'IoT 센서 모듈',
+        //             data: [5, 15, 25, 35, 40, 45],
+        //             borderColor: '#764ba2',
+        //             backgroundColor: 'rgba(118, 75, 162, 0.1)',
+        //             tension: 0.4
+        //         }, {
+        //             label: '웨어러블 디바이스',
+        //             data: [20, 40, 60, 75, 85, 90],
+        //             borderColor: '#28a745',
+        //             backgroundColor: 'rgba(40, 167, 69, 0.1)',
+        //             tension: 0.4
+        //         }]
+        //     },
+        //     options: {
+        //         responsive: true,
+        //         maintainAspectRatio: false,
+        //         plugins: {
+        //             legend: {
+        //                 position: 'top',
+        //             }
+        //         },
+        //         scales: {
+        //             y: {
+        //                 beginAtZero: true,
+        //                 max: 100,
+        //                 ticks: {
+        //                     callback: function(value) {
+        //                         return value + '%';
+        //                     }
+        //                 }
+        //             }
+        //         }
+        //     }
+        // });
 
         // 프로젝트 상태 분포 도넛차트
         const statusCtx = document.getElementById('statusChart').getContext('2d');
@@ -743,7 +756,7 @@
         new Chart(teamCtx, {
             type: 'doughnut',
             data: {
-                labels: ['제품기획팀', '디자인팀', '생산팀', '품질관리팀'],
+                labels: ['제품기획팀', '생산팀', '품질관리팀'],
                 datasets: [{
                     data: [30, 25, 20, 25],
                     backgroundColor: [
