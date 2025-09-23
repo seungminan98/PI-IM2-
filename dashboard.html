@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>제품 프로토타입 개발 관리 시스템 대시보드</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .header p {
+            opacity: 0.9;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .card-header i {
+            font-size: 1.5rem;
+            margin-right: 0.75rem;
+            color: #667eea;
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .kpi-value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-label {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-target {
+            font-size: 0.8rem;
+            color: #28a745;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin: 0.25rem;
+        }
+
+        .status-on-track {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .status-delayed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+
+        .milestone-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .milestone-item.delayed {
+            border-left-color: #dc3545;
+        }
+
+        .milestone-item.completed {
+            border-left-color: #28a745;
+        }
+
+        .deliverable-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .deliverable-version {
+            font-size: 0.8rem;
+            color: #666;
+            background-color: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        .notification-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            margin: 0.5rem 0;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+
+        .notification-item.urgent {
+            border-left-color: #dc3545;
+        }
+
+        .notification-item.info {
+            border-left-color: #17a2b8;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 1rem;
+        }
+
+        .action-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s ease;
+            margin: 0.25rem;
+        }
+
+        .action-button:hover {
+            transform: translateY(-1px);
+        }
+
+        .action-button.secondary {
+            background: #6c757d;
+        }
+
+        .action-button.success {
+            background: #28a745;
+        }
+
+        .action-button.danger {
+            background: #dc3545;
+        }
+
+        .filter-tabs {
+            display: flex;
+            margin-bottom: 1rem;
+            background: white;
+            border-radius: 8px;
+            padding: 0.25rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .filter-tab {
+            flex: 1;
+            padding: 0.75rem;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .filter-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .filter-tab:hover:not(.active) {
+            background: #f8f9fa;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .kpi-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-cogs"></i> 제품 프로토타입 개발 관리 시스템</h1>
+        <p>협업 툴 기반 통합 프로젝트 관리 대시보드</p>
+    </div>
+
+    <div class="container">
+        <!-- KPI 지표 섹션 -->
+        <div class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-value">22%</div>
+                <div class="kpi-label">개발 리드타임 단축율</div>
+                <div class="kpi-target">목표: 20% 달성 ✓</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">75%</div>
+                <div class="kpi-label">자동화 산출물 비율</div>
+                <div class="kpi-target">목표: 70% 달성 ✓</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">1</div>
+                <div class="kpi-label">마일스톤 지연 건수</div>
+                <div class="kpi-target">목표: 2건 이하 달성 ✓</div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-value">92%</div>
+                <div class="kpi-label">협업 툴 사용률</div>
+                <div class="kpi-target">목표: 90% 달성 ✓</div>
+            </div>
+        </div>
+
+        <!-- 메인 대시보드 그리드 -->
+        <div class="dashboard-grid">
+            <!-- 프로젝트 현황 -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-project-diagram"></i>
+                    <h3>프로젝트 현황</h3>
+                </div>
+                <div class="filter-tabs">
+                    <div class="filter-tab active">전체</div>
+                    <div class="filter-tab">진행중</div>
+                    <div class="filter-tab">완료</div>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <h4>스마트 워치 프로토타입 v2.1</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 75%;"></div>
+                    </div>
+                    <span class="status-badge status-on-track">정상 진행</span>
+                    <span style="float: right; color: #666;">75% 완료</span>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <h4>IoT 센서 모듈 프로토타입 v1.3</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 45%;"></div>
+                    </div>
+                    <span class="status-badge status-pending">검토 대기</span>
+                    <span style="float: right; color: #666;">45% 완료</span>
+                </div>
+
+                <div>
+                    <h4>웨어러블 디바이스 프로토타입 v3.0</h4>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 90%;"></div>
+                    </div>
+                    <span class="status-badge status-on-track">최종 단계</span>
+                    <span style="float: right; color: #666;">90% 완료</span>
+                </div>
+            </div>
+
+            <!-- 일정 관리 -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-calendar-alt"></i>
+                    <h3>일정 관리</h3>
+                </div>
+                
+                <div class="milestone-item completed">
+                    <div>
+                        <strong>요건 정의 완료</strong>
+                        <div style="font-size: 0.8rem; color: #666;">2024.01.15</div>
+                    </div>
+                    <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                </div>
+
+                <div class="milestone-item completed">
+                    <div>
+                        <strong>디자인 검토 완료</strong>
+                        <div style="font-size: 0.8rem; color: #666;">2024.01.22</div>
+                    </div>
+                    <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                </div>
+
+                <div class="milestone-item">
+                    <div>
+                        <strong>프로토타입 제작</strong>
+                        <div style="font-size: 0.8rem; color: #666;">2024.02.05 예정</div>
+                    </div>
+                    <i class="fas fa-clock" style="color: #667eea;"></i>
+                </div>
+
+                <div class="milestone-item delayed">
+                    <div>
+                        <strong>품질 검수</strong>
+                        <div style="font-size: 0.8rem; color: #dc3545;">2024.02.12 (지연)</div>
+                    </div>
+                    <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <button class="action-button">
+                        <i class="fas fa-plus"></i> 새 일정 추가
+                    </button>
+                    <button class="action-button secondary">
+                        <i class="fas fa-edit"></i> 일정 수정
+                    </button>
+                </div>
+            </div>
+
+            <!-- 산출물 관리 -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-folder-open"></i>
+                    <h3>산출물 관리</h3>
+                </div>
+                
+                <div class="deliverable-item">
+                    <div>
+                        <strong>제품 요구사항서</strong>
+                        <div style="font-size: 0.8rem; color: #666;">제품기획팀</div>
+                    </div>
+                    <div>
+                        <span class="deliverable-version">v2.1</span>
+                        <i class="fas fa-lock" style="color: #667eea; margin-left: 0.5rem;"></i>
+                    </div>
+                </div>
+
+                <div class="deliverable-item">
+                    <div>
+                        <strong>디자인 스펙 문서</strong>
+                        <div style="font-size: 0.8rem; color: #666;">디자인팀</div>
+                    </div>
+                    <div>
+                        <span class="deliverable-version">v1.3</span>
+                        <i class="fas fa-edit" style="color: #ffc107; margin-left: 0.5rem;"></i>
+                    </div>
+                </div>
+
+                <div class="deliverable-item">
+                    <div>
+                        <strong>기술 검토 보고서</strong>
+                        <div style="font-size: 0.8rem; color: #666;">품질관리팀</div>
+                    </div>
+                    <div>
+                        <span class="deliverable-version">v1.0</span>
+                        <i class="fas fa-eye" style="color: #6c757d; margin-left: 0.5rem;"></i>
+                    </div>
+                </div>
+
+                <div class="deliverable-item">
+                    <div>
+                        <strong>프로토타입 제작 가이드</strong>
+                        <div style="font-size: 0.8rem; color: #666;">생산팀</div>
+                    </div>
+                    <div>
+                        <span class="deliverable-version">v3.2</span>
+                        <i class="fas fa-check-circle" style="color: #28a745; margin-left: 0.5rem;"></i>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <button class="action-button">
+                        <i class="fas fa-upload"></i> 문서 업로드
+                    </button>
+                    <button class="action-button secondary">
+                        <i class="fas fa-history"></i> 버전 히스토리
+                    </button>
+                </div>
+            </div>
+
+            <!-- 커뮤니케이션 -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-comments"></i>
+                    <h3>커뮤니케이션</h3>
+                </div>
+                
+                <div class="notification-item urgent">
+                    <i class="fas fa-exclamation-circle" style="color: #dc3545; margin-right: 0.75rem;"></i>
+                    <div>
+                        <strong>품질 검수 지연 알림</strong>
+                        <div style="font-size: 0.8rem; color: #666;">2시간 전</div>
+                    </div>
+                </div>
+
+                <div class="notification-item info">
+                    <i class="fas fa-info-circle" style="color: #17a2b8; margin-right: 0.75rem;"></i>
+                    <div>
+                        <strong>새 피드백 등록됨</strong>
+                        <div style="font-size: 0.8rem; color: #666;">디자인팀에서 요청</div>
+                    </div>
+                </div>
+
+                <div class="notification-item">
+                    <i class="fas fa-calendar-check" style="color: #ffc107; margin-right: 0.75rem;"></i>
+                    <div>
+                        <strong>주간 미팅 일정</strong>
+                        <div style="font-size: 0.8rem; color: #666;">내일 오후 2시</div>
+                    </div>
+                </div>
+
+                <div class="notification-item">
+                    <i class="fas fa-check-circle" style="color: #28a745; margin-right: 0.75rem;"></i>
+                    <div>
+                        <strong>승인 완료</strong>
+                        <div style="font-size: 0.8rem; color: #666;">프로토타입 제작 승인됨</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <button class="action-button">
+                        <i class="fas fa-plus"></i> 새 메시지
+                    </button>
+                    <button class="action-button secondary">
+                        <i class="fas fa-users"></i> 미팅 예약
+                    </button>
+                </div>
+            </div>
+
+            <!-- 진행률 차트 -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-chart-line"></i>
+                    <h3>프로젝트 진행률</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 팀별 업무 현황 -->
+            <div class="card">
+                <div class="card-header">
+                    <i class="fas fa-users"></i>
+                    <h3>팀별 업무 현황</h3>
+                </div>
+                
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>제품기획팀</span>
+                        <span>85%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 85%;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>디자인팀</span>
+                        <span>72%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 72%;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>생산팀</span>
+                        <span>68%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 68%;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 1rem;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                        <span>품질관리팀</span>
+                        <span>91%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 91%;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem;">
+                    <button class="action-button">
+                        <i class="fas fa-user-plus"></i> 팀원 추가
+                    </button>
+                    <button class="action-button secondary">
+                        <i class="fas fa-cog"></i> 권한 설정
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 액션 버튼들 -->
+        <div style="text-align: center; margin-top: 2rem;">
+            <button class="action-button success">
+                <i class="fas fa-play"></i> 새 프로젝트 시작
+            </button>
+            <button class="action-button">
+                <i class="fas fa-download"></i> 리포트 다운로드
+            </button>
+            <button class="action-button secondary">
+                <i class="fas fa-cog"></i> 시스템 설정
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 진행률 차트 생성
+        const ctx = document.getElementById('progressChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['1주차', '2주차', '3주차', '4주차', '5주차', '6주차'],
+                datasets: [{
+                    label: '스마트 워치 프로토타입',
+                    data: [10, 25, 40, 55, 70, 75],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: 'IoT 센서 모듈',
+                    data: [5, 15, 25, 35, 40, 45],
+                    borderColor: '#764ba2',
+                    backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                    tension: 0.4
+                }, {
+                    label: '웨어러블 디바이스',
+                    data: [20, 40, 60, 75, 85, 90],
+                    borderColor: '#28a745',
+                    backgroundColor: 'rgba(40, 167, 69, 0.1)',
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            callback: function(value) {
+                                return value + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // 필터 탭 기능
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 실시간 업데이트 시뮬레이션
+        setInterval(() => {
+            const progressBars = document.querySelectorAll('.progress-fill');
+            progressBars.forEach(bar => {
+                const currentWidth = parseInt(bar.style.width);
+                if (currentWidth < 100 && Math.random() > 0.95) {
+                    bar.style.width = (currentWidth + 1) + '%';
+                }
+            });
+        }, 5000);
+
+        // 알림 클릭 이벤트
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.style.backgroundColor = '#e3f2fd';
+                setTimeout(() => {
+                    this.style.backgroundColor = '#f8f9fa';
+                }, 1000);
+            });
+        });
+    </script>
+</body>
+</html>
