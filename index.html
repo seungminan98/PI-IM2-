@@ -452,8 +452,8 @@
 
                 <div class="deliverable-item">
                     <div>
-                        <strong>디자인 스펙 문서</strong>
-                        <div style="font-size: 0.8rem; color: #666;">디자인팀</div>
+                        <strong>제품 스펙 문서</strong>
+                        <div style="font-size: 0.8rem; color: #666;">제품개발팀</div>
                     </div>
                     <div>
                         <span class="deliverable-version">v1.3</span>
@@ -597,7 +597,7 @@
                 
                 <div style="margin-bottom: 1rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                        <span>제품기획팀</span>
+                        <span>제품개발팀</span>
                         <span>85%</span>
                     </div>
                     <div class="progress-bar">
@@ -605,15 +605,6 @@
                     </div>
                 </div>
 
-                <div style="margin-bottom: 1rem;">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                        <span>디자인팀</span>
-                        <span>72%</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 72%;"></div>
-                    </div>
-                </div>
 
                 <div style="margin-bottom: 1rem;">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
@@ -756,12 +747,11 @@
         new Chart(teamCtx, {
             type: 'doughnut',
             data: {
-                labels: ['제품기획팀', '생산팀', '품질관리팀'],
+                labels: ['제품개발팀', '생산팀', '품질관리팀'],
                 datasets: [{
-                    data: [30, 25, 20, 25],
+                    data: [40, 30, 30],
                     backgroundColor: [
                         '#667eea',
-                        '#764ba2',
                         '#28a745',
                         '#ffc107'
                     ],
